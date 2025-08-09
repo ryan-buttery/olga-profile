@@ -18,6 +18,11 @@ env:
 jobs:
   security-scan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read          # Required for accessing container registry
+      security-events: write  # Required for creating security issues
+      issues: write           # Required for creating issues
     
     steps:
     - name: Set image tag

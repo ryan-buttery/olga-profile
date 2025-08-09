@@ -138,6 +138,10 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request'
     continue-on-error: true  # Don't fail the entire workflow if security scan fails
+    permissions:
+      contents: read
+      security-events: write  # Required for uploading SARIF results
+      actions: read           # Required for accessing artifacts
     
     steps:
     - name: Wait for image to be available
