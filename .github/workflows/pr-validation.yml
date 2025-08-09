@@ -1,0 +1,247 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    branches: [ main, master ]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # Job 1: Code Quality Check
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build SASS
+      run: npm run build
+    
+    - name: Validate HTML structure
+      run: |
+        echo "🔍 Checking HTML files for basic structure..."
+        for file in *.html; do
+          if [[ -f "$file" ]]; then
+            echo "Checking $file..."
+            # Basic HTML validation
+            grep -q "<!DOCTYPE html>" "$file" || { echo "❌ Missing DOCTYPE in $file"; exit 1; }
+            grep -q "<html" "$file" || { echo "❌ Missing html tag in $file"; exit 1; }
+            grep -q "</html>" "$file" || { echo "❌ Missing closing html tag in $file"; exit 1; }
+            grep -q "<head>" "$file" || { echo "❌ Missing head tag in $file"; exit 1; }
+            grep -q "<body>" "$file" || { echo "❌ Missing body tag in $file"; exit 1; }
+            echo "✅ $file structure is valid"
+          fi
+        done
+    
+    - name: Check CSS compilation
+      run: |
+        echo "🎨 Verifying CSS compilation..."
+        test -f assets/css/style.css || { echo "❌ CSS file not generated"; exit 1; }
+        
+        # Check if CSS contains our brand colors
+        grep -q "#00a6a6" assets/css/style.css || { echo "❌ Primary brand color missing in CSS"; exit 1; }
+        grep -q "#ffad05" assets/css/style.css || { echo "❌ Secondary brand color missing in CSS"; exit 1; }
+        grep -q "#0d1f48" assets/css/style.css || { echo "❌ Accent brand color missing in CSS"; exit 1; }
+        
+        echo "✅ CSS compilation successful with brand colors"
+    
+    - name: Check responsive design elements
+      run: |
+        echo "📱 Checking for responsive design elements..."
+        for file in *.html; do
+          if [[ -f "$file" ]]; then
+            # Check for viewport meta tag
+            grep -q "viewport" "$file" || { echo "❌ Missing viewport meta tag in $file"; exit 1; }
+            # Check for Bootstrap classes
+            grep -q "col-" "$file" || { echo "⚠️  No Bootstrap grid found in $file"; }
+            echo "✅ $file has responsive elements"
+          fi
+        done
+
+  # Job 2: Docker Build Test
+  docker-build-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies and build
+      run: |
+        npm ci
+        npm run build
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Test Docker build
+      run: |
+        echo "🐳 Testing Docker build..."
+        docker build -f Dockerfile.simple -t test-image .
+        echo "✅ Docker build successful"
+    
+    - name: Test Docker container
+      run: |
+        echo "🧪 Testing Docker container startup..."
+        
+        # Start container in background
+        docker run -d --name test-container -p 8080:8080 test-image
+        
+        # Wait for container to start
+        sleep 10
+        
+        # Test if container is running
+        if docker ps | grep -q test-container; then
+          echo "✅ Container started successfully"
+        else
+          echo "❌ Container failed to start"
+          docker logs test-container
+          exit 1
+        fi
+        
+        # Test health endpoint
+        if docker exec test-container wget --spider -q http://localhost:8080/health; then
+          echo "✅ Health check passed"
+        else
+          echo "❌ Health check failed"
+          docker logs test-container
+          exit 1
+        fi
+        
+        # Clean up
+        docker stop test-container
+        docker rm test-container
+
+  # Job 3: Link Checker
+  link-checker:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Check internal links
+      run: |
+        echo "🔗 Checking internal page links..."
+        
+        # Check if all internal links exist
+        for file in *.html; do
+          if [[ -f "$file" ]]; then
+            echo "Checking links in $file..."
+            
+            # Extract href attributes and check if files exist
+            grep -o 'href="[^"]*\.html"' "$file" | sed 's/href="//g' | sed 's/"//g' | while read link; do
+              if [[ ! -f "$link" ]]; then
+                echo "❌ Broken internal link: $link in $file"
+                exit 1
+              fi
+            done
+            
+            echo "✅ Internal links in $file are valid"
+          fi
+        done
+    
+    - name: Check asset references
+      run: |
+        echo "📁 Checking asset references..."
+        
+        for file in *.html; do
+          if [[ -f "$file" ]]; then
+            echo "Checking assets in $file..."
+            
+            # Check CSS references
+            if grep -q "assets/css/style.css" "$file"; then
+              test -f "assets/css/style.css" || { echo "❌ Missing CSS file referenced in $file"; exit 1; }
+            fi
+            
+            echo "✅ Asset references in $file are valid"
+          fi
+        done
+
+  # Job 4: Accessibility Check
+  accessibility-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Basic accessibility checks
+      run: |
+        echo "♿ Running basic accessibility checks..."
+        
+        for file in *.html; do
+          if [[ -f "$file" ]]; then
+            echo "Checking accessibility in $file..."
+            
+            # Check for alt attributes on images (if any img tags exist)
+            if grep -q "<img" "$file"; then
+              if ! grep -q "alt=" "$file"; then
+                echo "⚠️  Images without alt attributes found in $file"
+              fi
+            fi
+            
+            # Check for lang attribute
+            grep -q 'lang="' "$file" || { echo "⚠️  Missing lang attribute in $file"; }
+            
+            # Check for title tag
+            grep -q "<title>" "$file" || { echo "❌ Missing title tag in $file"; exit 1; }
+            
+            echo "✅ Basic accessibility check passed for $file"
+          fi
+        done
+
+  # Job 5: Comment on PR
+  pr-comment:
+    runs-on: ubuntu-latest
+    needs: [code-quality, docker-build-test, link-checker, accessibility-check]
+    if: always()
+    
+    steps:
+    - name: Comment PR
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const jobs = [
+            { name: 'Code Quality', result: '${{ needs.code-quality.result }}' },
+            { name: 'Docker Build Test', result: '${{ needs.docker-build-test.result }}' },
+            { name: 'Link Checker', result: '${{ needs.link-checker.result }}' },
+            { name: 'Accessibility Check', result: '${{ needs.accessibility-check.result }}' }
+          ];
+          
+          let comment = '## 🤖 PR Validation Results\n\n';
+          let allPassed = true;
+          
+          jobs.forEach(job => {
+            const emoji = job.result === 'success' ? '✅' : job.result === 'failure' ? '❌' : '⚠️';
+            comment += `${emoji} **${job.name}**: ${job.result}\n`;
+            if (job.result !== 'success') allPassed = false;
+          });
+          
+          if (allPassed) {
+            comment += '\n🎉 All checks passed! This PR is ready for review.';
+          } else {
+            comment += '\n⚠️ Some checks failed. Please review the workflow logs.';
+          }
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
