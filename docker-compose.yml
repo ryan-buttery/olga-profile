@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  web:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.simple
+    container_name: olga-english-website
+    ports:
+      - "3000:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.olga-english.rule=Host(`localhost`)"
+      - "traefik.http.routers.olga-english.entrypoints=web"
+      - "traefik.http.services.olga-english.loadbalancer.server.port=8080"
+    networks:
+      - web-network
+
+  # Optional: Add a reverse proxy for production
+  # Uncomment the section below if you want to use Traefik as a reverse proxy
+  # traefik:
+  #   image: traefik:v2.10
+  #   container_name: traefik
+  #   command:
+  #     - "--api.insecure=true"
+  #     - "--providers.docker=true"
+  #     - "--providers.docker.exposedbydefault=false"
+  #     - "--entrypoints.web.address=:80"
+  #     - "--entrypoints.websecure.address=:443"
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #     - "8080:8080"  # Traefik dashboard
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #   networks:
+  #     - web-network
+
+networks:
+  web-network:
+    driver: bridge

@@ -1,0 +1,432 @@
+// Import Bootstrap variables first to override them
+@import 'variables';
+
+// Override Bootstrap variables
+:root {
+  --bs-primary: #{$brand-primary};
+  --bs-secondary: #{$brand-secondary};
+  --bs-font-sans-serif: #{$font-family-base};
+}
+
+// Import Bootstrap (you can also use a local copy if preferred)
+// For now, we'll use the CDN version and add our custom styles
+
+// Custom styles
+body {
+  font-family: $font-family-base;
+  line-height: $line-height-base;
+}
+
+// Navigation styles
+.navbar-brand {
+  font-size: $navbar-brand-font-size;
+  font-weight: 700;
+}
+
+// Hero section styles
+.hero-section {
+  background: linear-gradient(135deg, $brand-primary 0%, $brand-primary-light 100%);
+  
+  .min-vh-75 {
+    min-height: $hero-min-height;
+  }
+}
+
+// Enhanced CTA sections
+.cta-section {
+  background: linear-gradient(45deg, $brand-accent 0%, $brand-accent-light 100%);
+  
+  &.secondary-cta {
+    background: linear-gradient(45deg, $brand-secondary 0%, $brand-secondary-light 100%);
+  }
+}
+
+// Card styles
+.card {
+  border: none;
+  border-radius: $card-border-radius;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+// Button styles
+.btn {
+  border-radius: $btn-border-radius;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  
+  &.btn-lg {
+    padding: 0.75rem 2rem;
+  }
+  
+  // Primary button with brand colors
+  &.btn-primary {
+    background: linear-gradient(45deg, $brand-primary, $brand-primary-light);
+    border: none;
+    
+    &:hover, &:focus {
+      background: linear-gradient(45deg, $brand-primary-dark, $brand-primary);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba($brand-primary, 0.3);
+    }
+  }
+  
+  // Secondary button
+  &.btn-secondary {
+    background: $brand-secondary;
+    border: none;
+    color: $brand-accent;
+    
+    &:hover, &:focus {
+      background: $brand-secondary-light;
+      color: $brand-accent;
+      transform: translateY(-1px);
+    }
+  }
+  
+  // Accent button
+  &.btn-accent {
+    background: $brand-accent;
+    border: none;
+    color: $brand-neutral;
+    
+    &:hover, &:focus {
+      background: $brand-accent-light;
+      color: $brand-neutral;
+      transform: translateY(-1px);
+    }
+  }
+  
+  // Outline variations
+  &.btn-outline-primary {
+    border: 2px solid $brand-primary;
+    color: $brand-primary;
+    
+    &:hover, &:focus {
+      background: $brand-primary;
+      color: $brand-neutral;
+      transform: translateY(-1px);
+    }
+  }
+  
+  &.btn-outline-light {
+    border: 2px solid $brand-neutral;
+    color: $brand-neutral;
+    
+    &:hover, &:focus {
+      background: $brand-neutral;
+      color: $brand-primary;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// Service icons
+.bi {
+  &.display-1 {
+    font-size: 4rem;
+  }
+  
+  &.display-4 {
+    font-size: 2.5rem;
+  }
+}
+
+// Form styles
+.form-control {
+  border-radius: $btn-border-radius;
+  border: 2px solid #e9ecef;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  
+  &:focus {
+    border-color: $brand-primary;
+    box-shadow: 0 0 0 0.2rem rgba($brand-primary, 0.25);
+  }
+}
+
+// Social links
+.social-links {
+  a {
+    font-size: 1.5rem;
+    transition: color 0.2s ease-in-out;
+    
+    &:hover {
+      color: $brand-secondary !important;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .hero-section {
+    .display-4 {
+      font-size: 2.5rem;
+    }
+    
+    .lead {
+      font-size: 1.1rem;
+    }
+  }
+  
+  .display-5 {
+    font-size: 2rem;
+  }
+}
+
+// Featured service card styling
+.featured-service {
+  position: relative;
+  border: 2px solid $brand-secondary;
+  transform: scale(1.02);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, $brand-primary, $brand-secondary);
+    border-radius: $card-border-radius;
+    z-index: -1;
+  }
+  
+  .card-header {
+    background: linear-gradient(135deg, $brand-accent 0%, $brand-accent-light 100%) !important;
+    color: $brand-neutral;
+    
+    .badge {
+      background: $brand-secondary !important;
+      color: $brand-accent !important;
+    }
+  }
+}
+
+// Teacher image placeholder styling
+.teacher-image-placeholder {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+// Method cards styling
+.method-card {
+  background: rgba(white, 0.8);
+  border-radius: $card-border-radius;
+  transition: transform 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-5px);
+    background: white;
+  }
+}
+
+// Content cards for newsletter page
+.content-card {
+  transition: transform 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-3px);
+  }
+}
+
+// Service cards
+.service-card {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+// Testimonial cards
+.testimonial-card {
+  &:hover {
+    transform: translateY(-3px);
+  }
+}
+
+// Newsletter form enhancements
+#newsletterForm {
+  .form-control, .form-select {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+  }
+  
+  .btn {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}
+
+// Problem description styling
+.problem-description {
+  .bi-x-circle {
+    color: #dc3545;
+    font-size: 1.25rem;
+  }
+}
+
+// Learning stages visual
+.learning-stages {
+  .stage {
+    border-left: 4px solid #e9ecef;
+    
+    &:last-child {
+      border-left: 4px solid $brand-primary;
+    }
+  }
+}
+
+// Accent color highlights
+.accent-highlight {
+  color: $brand-accent !important;
+  font-weight: 600;
+}
+
+.accent-border {
+  border-left: 4px solid $brand-accent;
+  padding-left: 1rem;
+}
+
+.secondary-highlight {
+  background: linear-gradient(90deg, transparent, $brand-secondary, transparent);
+  padding: 0.5rem 0;
+  border-radius: 4px;
+}
+
+// Navigation enhancements
+.navbar {
+  .navbar-nav .nav-link.active {
+    color: $brand-primary !important;
+    font-weight: 600;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: $brand-secondary;
+    }
+  }
+}
+
+// Stats and numbers
+.stats-number {
+  color: $brand-secondary;
+  text-shadow: 1px 1px 2px rgba($brand-accent, 0.2);
+}
+
+// Alert and callout enhancements
+.alert-brand {
+  background: linear-gradient(135deg, rgba($brand-primary, 0.1), rgba($brand-secondary, 0.1));
+  border-left: 4px solid $brand-accent;
+  color: $brand-accent;
+  
+  .alert-icon {
+    color: $brand-secondary;
+  }
+}
+
+// Form enhancements
+.form-control:focus {
+  border-color: $brand-primary;
+  box-shadow: 0 0 0 0.2rem rgba($brand-primary, 0.25);
+}
+
+.form-select:focus {
+  border-color: $brand-primary;
+  box-shadow: 0 0 0 0.2rem rgba($brand-primary, 0.25);
+}
+
+// Testimonial stars
+.stars .bi-star-fill {
+  color: $brand-secondary;
+}
+
+// Social links with accent
+.social-links a {
+  &:hover {
+    color: $brand-secondary !important;
+    transform: scale(1.1);
+  }
+}
+
+// Problem description enhancements
+.problem-description {
+  .bi-x-circle {
+    color: #dc3545;
+    font-size: 1.25rem;
+  }
+  
+  strong {
+    color: $brand-accent;
+  }
+}
+
+// Learning stages with accent
+.learning-stages {
+  .stage {
+    border-left: 4px solid #e9ecef;
+    transition: all 0.2s ease;
+    
+    &:last-child {
+      border-left: 4px solid $brand-primary;
+      background: linear-gradient(90deg, rgba($brand-primary, 0.1), transparent);
+    }
+    
+    &:hover {
+      transform: translateX(5px);
+    }
+  }
+}
+
+// Utility classes
+.text-brand-primary {
+  color: $brand-primary !important;
+}
+
+.text-brand-secondary {
+  color: $brand-secondary !important;
+}
+
+.text-brand-accent {
+  color: $brand-accent !important;
+}
+
+.bg-brand-primary {
+  background-color: $brand-primary !important;
+}
+
+.bg-brand-secondary {
+  background-color: $brand-secondary !important;
+}
+
+.bg-brand-accent {
+  background-color: $brand-accent !important;
+  color: $brand-neutral !important;
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(135deg, $brand-primary, $brand-primary-light) !important;
+}
+
+.bg-gradient-secondary {
+  background: linear-gradient(135deg, $brand-secondary, $brand-secondary-light) !important;
+}
+
+.bg-gradient-accent {
+  background: linear-gradient(135deg, $brand-accent, $brand-accent-light) !important;
+  color: $brand-neutral !important;
+}

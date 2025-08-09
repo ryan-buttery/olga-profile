@@ -1,0 +1,22 @@
+# Simple single-stage build for nginx deployment
+FROM nginx:alpine
+
+# Copy custom nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy website files (CSS should be pre-built)
+COPY *.html /usr/share/nginx/html/
+COPY assets/ /usr/share/nginx/html/assets/
+
+# Set proper permissions for nginx files
+RUN chmod -R 755 /usr/share/nginx/html
+
+# Expose port 8080
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/ || exit 1
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
